@@ -102,3 +102,9 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# Custom additions
+*.swp
+secure_notes_client/ui/*.py
+!secure_notes_client/ui/__init__.py
+!secure_notes_client/ui/uic_compile.py
