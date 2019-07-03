@@ -11,6 +11,8 @@ def create_login_dialog():
     # Use exec_() instead of open() as we want application blocking
     # Also open() does not display properly
     # (Environment=Kubuntu Linux 18.04, Qt 5.11.1)
-    dialog_form.exec_()
+    login_response_code=dialog_form.exec_()
+    if login_response_code==QtWidgets.QDialog.Rejected:
+        return
     print(dialog_ui_form.usernameLineEdit.text())
     print(dialog_ui_form.passwordLineEdit.text())
