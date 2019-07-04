@@ -44,8 +44,6 @@ class MainWindowClass(QtWidgets.QMainWindow):
             return
         username=dialog_ui_form.usernameLineEdit.text()
         password=dialog_ui_form.passwordLineEdit.text()
-        print(username)
-        print(password)
         self.ui_obj.actionLogin.setEnabled(False)
         self.ui_obj.actionLogout.setEnabled(False)
         progress_dialog=QtWidgets.QProgressDialog("Logging in...","Cancel",0,2,self)
@@ -75,20 +73,21 @@ class MainWindowClass(QtWidgets.QMainWindow):
         logout_confirm.setStandardButtons(QtWidgets.QMessageBox.Ok |
                 QtWidgets.QMessageBox.Cancel)
         logout_ret_code=logout_confirm.exec_()
+        # Dialog close is also caught here
         if logout_ret_code==QtWidgets.QMessageBox.Cancel:
             return
-        if logout_ret_code==QtWidgets.QMessageBox.Ok:
-            logout_status=networking.send_logout_request(self.config_obj.url,
-                    self.config_obj.token)
-            if logout_status:
-                QtWidgets.QMessageBox.information(self,
-                        "Logout successful","You have successfully logged out.")
-            else:
-                QtWidgets.QMessageBox.warning(self,
-                        "Logout Failed","Unable to log out.")
-                return
-        else: #Should never happen
-            pass #Error out here?
+        # Only other option is OK here
+        self.ui_obj.actionLogin.setEnabled(False)
+        self.ui_obj.actionLogout.setEnabled(False)
+        logout_status=networking.send_logout_request(self.config_obj.url,
+                self.config_obj.token)
+        if logout_status:
+            QtWidgets.QMessageBox.information(self,
+                    "Logout successful","You have successfully logged out.")
+        else:
+            QtWidgets.QMessageBox.warning(self,
+                    "Logout Failed","Unable to log out.")
+            return
         self.config_obj.username=""
         self.config_obj.token=""
         self.update_loginlabel_text()
