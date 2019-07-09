@@ -68,7 +68,8 @@ class MainWindowClass(QtWidgets.QMainWindow):
 
     def create_logout_dialog(self):
         logout_confirm=QtWidgets.QMessageBox()
-        logout_confirm.setText("Confirm logging out?")
+        logout_confirm.setText("Confirm logging out as {}?"
+                               .format(self.config_obj.username))
         logout_confirm.setStandardButtons(QtWidgets.QMessageBox.Ok |
                 QtWidgets.QMessageBox.Cancel)
         logout_ret_code=logout_confirm.exec_()
