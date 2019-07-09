@@ -2,16 +2,15 @@ from PySide2 import QtWidgets
 from PySide2.QtCore import Qt, QCoreApplication
 
 from ui.login_dialog import *
-from config_obj import ConfigObj
 import networking
 
 class MainWindowClass(QtWidgets.QMainWindow):
     logout_text="You are currently not logged in."
     login_text="You are logged in as {}."
-    def __init__(self, ui_obj):
+    def __init__(self, ui_obj, config_obj):
         super().__init__()
         self.ui_obj=ui_obj
-        self.config_obj=ConfigObj()
+        self.config_obj=config_obj
         ui_obj.setupUi(self)
         ui_obj.actionLogin.triggered.connect(self.create_login_dialog)
         ui_obj.actionLogout.triggered.connect(self.create_logout_dialog)
