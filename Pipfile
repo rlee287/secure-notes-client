@@ -8,7 +8,7 @@ verify_ssl = true
 [packages]
 requests = "*"
 pyside2 = "*"
-cython = "*"
+argon2-cffi = "*"
 
 [requires]
 python_version = "3.6"
