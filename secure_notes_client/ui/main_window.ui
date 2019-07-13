@@ -24,9 +24,25 @@
     </item>
     <item row="1" column="0">
      <widget class="QTreeWidget" name="noteTreeWidget">
+      <property name="columnCount">
+       <number>3</number>
+      </property>
+      <attribute name="headerShowSortIndicator" stdset="0">
+       <bool>true</bool>
+      </attribute>
       <column>
        <property name="text">
         <string notr="true">1</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string notr="true">2</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string notr="true">3</string>
        </property>
       </column>
      </widget>
@@ -49,7 +65,16 @@
     <addaction name="actionLogin"/>
     <addaction name="actionLogout"/>
    </widget>
+   <widget class="QMenu" name="menuNotes">
+    <property name="title">
+     <string>&amp;Notes</string>
+    </property>
+    <addaction name="actionCreate"/>
+    <addaction name="actionSearch"/>
+    <addaction name="actionRefresh"/>
+   </widget>
    <addaction name="menutext"/>
+   <addaction name="menuNotes"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionLogin">
@@ -60,6 +85,21 @@
   <action name="actionLogout">
    <property name="text">
     <string>L&amp;ogout</string>
+   </property>
+  </action>
+  <action name="actionCreate">
+   <property name="text">
+    <string>&amp;Create</string>
+   </property>
+  </action>
+  <action name="actionSearch">
+   <property name="text">
+    <string>&amp;Search</string>
+   </property>
+  </action>
+  <action name="actionRefresh">
+   <property name="text">
+    <string>&amp;Refresh</string>
    </property>
   </action>
  </widget>
