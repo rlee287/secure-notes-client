@@ -34,3 +34,14 @@ def populate_userdir(config_obj, password):
             #throw huge warning
             return
 
+#Note I/O which is basically format checking+encryption/decryption
+#TODO: link in config obj
+def write_noteobj(note_obj):
+    id_name=note_obj["note"]["_id"]
+    with open("{}.json".format(id_name),"w") as fil:
+        json.dump(note_obj,fil)
+
+def read_noteobj(note_id):
+    with open("{}.json".format(note_id),"r") as fil:
+        note_info=json.load(fil)
+    return note_info
