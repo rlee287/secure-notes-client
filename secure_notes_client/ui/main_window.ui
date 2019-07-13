@@ -32,17 +32,17 @@
       </attribute>
       <column>
        <property name="text">
-        <string notr="true">1</string>
+        <string>Title</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string notr="true">2</string>
+        <string>Last Modified</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string notr="true">3</string>
+        <string>Body</string>
        </property>
       </column>
      </widget>
