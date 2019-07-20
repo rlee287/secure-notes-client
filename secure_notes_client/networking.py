@@ -61,3 +61,19 @@ def get_note(base_url,token,username,note_id):
                 "Last-Modified":note_request.headers["Last-Modified"]}
     except requests.exceptions.ConnectionError:
         return None
+
+def make_note(base_url,token,username,title,storage_method):
+    make_note_url=urljoin(base_url,posixpath.join(username,"notes"))
+    auth_header=construct_token_header(token)
+    param_dict={"title":title,
+                "storage_format":storage_method}
+    try:
+        creation_request=thread_pool.async_run_await_result(requests.post,
+                make_note_url,headers=auth_header,json=param_dict)
+        if creation_request.status_code!=201:
+            return None
+        return {"id":creation_request.json()["id"],
+                "ETag":creation_request.headers["ETag"],
+                "Last-Modified":creation_request.headers["Last-Modified"]}
+    except requests.exceptions.ConnectionError:
+        return None
