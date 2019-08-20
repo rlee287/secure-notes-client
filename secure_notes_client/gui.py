@@ -1,5 +1,5 @@
 from PySide2 import QtWidgets
-from PySide2.QtCore import Qt, QCoreApplication
+from PySide2.QtCore import Qt, Slot, QCoreApplication
 
 from ui.login_dialog import Ui_LoginDialog
 from ui.create_dialog import Ui_NoteCreationDialog
@@ -19,7 +19,13 @@ class MainWindowClass(QtWidgets.QMainWindow):
         
         ui_obj.actionCreate.triggered.connect(self.create_action)
         ui_obj.actionRefresh.triggered.connect(self.refresh_note_list_dialog)
+        
+        ui_obj.noteTreeWidget.itemDoubleClicked.connect(self.print_clicked_item)
         self.update_loginlabel_text()
+
+    @Slot(QtWidgets.QTreeWidgetItem, int)
+    def print_clicked_item(self, item, column):
+        print([item.text(i) for i in range(item.columnCount())])
 
     def update_loginlabel_text(self):
         current_username=self.config_obj.username
@@ -90,8 +96,7 @@ class MainWindowClass(QtWidgets.QMainWindow):
         # Only other option is OK here
         self.ui_obj.actionLogin.setEnabled(False)
         self.ui_obj.actionLogout.setEnabled(False)
-        logout_status=networking.send_logout_request(self.config_obj.url,
-                self.config_obj.token)
+        logout_status=networking.send_logout_request(self.config_obj)
         if logout_status:
             # Changing username also invalidates token and key
             self.config_obj.username=""
@@ -105,18 +110,13 @@ class MainWindowClass(QtWidgets.QMainWindow):
             return
 
     def refresh_note_list(self):
-        list_notes=networking.get_list(self.config_obj.url,
-                                       self.config_obj.token,
-                                       self.config_obj.username)
+        list_notes=networking.get_list(self.config_obj)
         if list_notes is None:
             return False
         list_note_obj=list()
         self.ui_obj.noteTreeWidget.clear()
         for note_id in list_notes:
-            note_req=networking.get_note(self.config_obj.url,
-                                         self.config_obj.token,
-                                         self.config_obj.username,
-                                         note_id)
+            note_req=networking.get_note(self.config_obj,note_id)
             print(note_req)
             note_item=QtWidgets.QTreeWidgetItem([note_req["note"]["title"],
                                                  note_req["Last-Modified"],
@@ -134,6 +134,16 @@ class MainWindowClass(QtWidgets.QMainWindow):
         _,create_response_code=self.spawn_uic_dialog_modal(create_ui_form)
         if create_response_code==QtWidgets.QDialog.Rejected:
             return
+        new_title=create_ui_form.titleLineEdit.text()
+        print(new_title)
+        print(create_ui_form.radioPlain.isChecked())
+        print(create_ui_form.radioCompressed.isChecked())
+        note_make=networking.make_note(self.config_obj,
+                                       new_title,"plain")
+        note_item=QtWidgets.QTreeWidgetItem([new_title,
+                                            note_make["Last-Modified"],
+                                            ""])
+        self.ui_obj.noteTreeWidget.addTopLevelItem(note_item)
 
     @staticmethod
     def spawn_uic_dialog_modal(dialog_ui_form):
@@ -145,11 +155,11 @@ class MainWindowClass(QtWidgets.QMainWindow):
         # Use exec_() instead of open() as we want application blocking
         # Also open() does not display properly
         # (Environment=Kubuntu Linux 18.04, Qt 5.11.1)
+        # Return both the QDialog object and the return code for GC purposes
         return dialog_form,dialog_form.exec_()
 
     def closeEvent(self, event):
         # Proceed regardless of request status
         if self.config_obj.username:
-            networking.send_logout_request(
-                    self.config_obj.url,self.config_obj.token)
+            networking.send_logout_request(self.config_obj)
         event.accept()

@@ -22,9 +22,9 @@ def get_login_token(base_url,auth_tuple):
     except requests.exceptions.ConnectionError:
         return None
 
-def send_logout_request(base_url,token):
-    logout_url=urljoin(base_url,"logout")
-    logout_headers=construct_token_header(token)
+def send_logout_request(config_obj):
+    logout_url=urljoin(config_obj.url,"logout")
+    logout_headers=construct_token_header(config_obj.token)
     try:
         logout_request=thread_pool.async_run_await_result(requests.post,
                 logout_url,headers=logout_headers)
@@ -34,9 +34,9 @@ def send_logout_request(base_url,token):
     except requests.exceptions.ConnectionError:
         return False
 
-def get_list(base_url,token,username):
-    list_url=urljoin(base_url,posixpath.join(username,"notes"))
-    auth_header=construct_token_header(token)
+def get_list(config_obj):
+    list_url=urljoin(config_obj.url,posixpath.join(config_obj.username,"notes"))
+    auth_header=construct_token_header(config_obj.token)
     try:
         list_request=thread_pool.async_run_await_result(requests.get,
                 list_url,headers=auth_header)
@@ -46,9 +46,9 @@ def get_list(base_url,token,username):
     except requests.exceptions.ConnectionError:
         return None
 
-def get_note(base_url,token,username,note_id):
-    note_url=urljoin(base_url,posixpath.join(username,"notes",note_id))
-    auth_header=construct_token_header(token)
+def get_note(config_obj,note_id):
+    note_url=urljoin(config_obj.url,posixpath.join(config_obj.username,"notes",note_id))
+    auth_header=construct_token_header(config_obj.token)
     try:
         note_request=thread_pool.async_run_await_result(requests.get,
                 note_url,headers=auth_header)
@@ -62,9 +62,9 @@ def get_note(base_url,token,username,note_id):
     except requests.exceptions.ConnectionError:
         return None
 
-def make_note(base_url,token,username,title,storage_method):
-    make_note_url=urljoin(base_url,posixpath.join(username,"notes"))
-    auth_header=construct_token_header(token)
+def make_note(config_obj,title,storage_method):
+    make_note_url=urljoin(config_obj.url,posixpath.join(config_obj.username,"notes"))
+    auth_header=construct_token_header(config_obj.token)
     param_dict={"title":title,
                 "storage_format":storage_method}
     try:
