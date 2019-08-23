@@ -3,7 +3,7 @@ import sys
 
 from PySide2 import QtWidgets
 
-from gui import MainWindowClass
+from gui_main import MainWindowClass
 import thread_pool
 from config_obj import ConfigObj
 from ui.main_window import *

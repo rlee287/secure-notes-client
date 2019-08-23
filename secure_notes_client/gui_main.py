@@ -3,16 +3,21 @@ from PySide2.QtCore import Qt, Slot, QCoreApplication
 
 from ui.login_dialog import Ui_LoginDialog
 from ui.create_dialog import Ui_NoteCreationDialog
+from ui.note_edit_window import Ui_NoteEditWindow
+from gui_editor import EditorClass
+
 import filesystem
 import networking
 
 class MainWindowClass(QtWidgets.QMainWindow):
     logout_text="You are currently not logged in."
     login_text="You are logged in as {}."
+    
     def __init__(self, ui_obj, config_obj):
         super().__init__()
         self.ui_obj=ui_obj
         self.config_obj=config_obj
+        self.list_subwindow=list()
         ui_obj.setupUi(self)
         ui_obj.actionLogin.triggered.connect(self.login_action)
         ui_obj.actionLogout.triggered.connect(self.logout_action)
@@ -26,6 +31,12 @@ class MainWindowClass(QtWidgets.QMainWindow):
     @Slot(QtWidgets.QTreeWidgetItem, int)
     def print_clicked_item(self, item, column):
         print([item.text(i) for i in range(item.columnCount())])
+        note_window = EditorClass(Ui_NoteEditWindow(),
+                                   self.config_obj,
+                                   item.text(item.columnCount()-1))
+        note_window.show()
+        self.list_subwindow.append(note_window)
+        print(self.list_subwindow)
 
     def update_loginlabel_text(self):
         current_username=self.config_obj.username
@@ -113,14 +124,14 @@ class MainWindowClass(QtWidgets.QMainWindow):
         list_notes=networking.get_list(self.config_obj)
         if list_notes is None:
             return False
-        list_note_obj=list()
         self.ui_obj.noteTreeWidget.clear()
         for note_id in list_notes:
             note_req=networking.get_note(self.config_obj,note_id)
-            print(note_req)
+            filesystem.write_noteobj(self.config_obj,note_req)
             note_item=QtWidgets.QTreeWidgetItem([note_req["note"]["title"],
                                                  note_req["Last-Modified"],
-                                                 note_req["note"]["text"][:50]])
+                                                 note_req["note"]["text"][:50],
+                                                 note_req["note"]["_id"]])
             self.ui_obj.noteTreeWidget.addTopLevelItem(note_item)
         return True
     
