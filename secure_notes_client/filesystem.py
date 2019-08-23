@@ -35,13 +35,14 @@ def populate_userdir(config_obj, password):
             return
 
 #Note I/O which is basically format checking+encryption/decryption
-#TODO: link in config obj
-def write_noteobj(note_obj):
+def write_noteobj(config_obj,note_obj):
     id_name=note_obj["note"]["_id"]
-    with open("{}.json".format(id_name),"w") as fil:
+    filepath=os.path.join(config_obj.userdir,"{}.json".format(id_name))
+    with open(filepath,"w") as fil:
         json.dump(note_obj,fil)
 
-def read_noteobj(note_id):
-    with open("{}.json".format(note_id),"r") as fil:
+def read_noteobj(config_obj,note_id):
+    filepath=os.path.join(config_obj.userdir,"{}.json".format(note_id))
+    with open(filepath,"r") as fil:
         note_info=json.load(fil)
     return note_info
