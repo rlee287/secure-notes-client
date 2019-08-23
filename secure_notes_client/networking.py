@@ -4,9 +4,6 @@ import posixpath # Url slashes match POSIX directory separators
 
 import thread_pool
 import filesystem
-
-#TODO: unify API, possibly passing in config objects for all
-
 def construct_token_header(token):
     request_header={"Authorization":"Bearer "+token}
     return request_header
@@ -53,7 +50,7 @@ def get_note(config_obj,note_id):
         note_request=thread_pool.async_run_await_result(requests.get,
                 note_url,headers=auth_header)
         if note_request.status_code==304:
-            return filesystem.read_noteobj(note_id)
+            return filesystem.read_noteobj(config_obj,note_id)
         if note_request.status_code!=200:
             return None
         return {"note":note_request.json(),
