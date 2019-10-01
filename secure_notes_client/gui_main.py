@@ -1,5 +1,5 @@
 from PySide2 import QtWidgets
-from PySide2.QtCore import Qt, Slot, QCoreApplication
+from PySide2.QtCore import Qt, Slot, QObject, QCoreApplication
 
 from ui.login_dialog import Ui_LoginDialog
 from ui.create_dialog import Ui_NoteCreationDialog
@@ -17,7 +17,8 @@ class MainWindowClass(QtWidgets.QMainWindow):
         super().__init__()
         self.ui_obj=ui_obj
         self.config_obj=config_obj
-        self.list_subwindow=list()
+        self.list_subwindow=dict()
+        self.list_id_clean=list()
         ui_obj.setupUi(self)
         ui_obj.actionLogin.triggered.connect(self.login_action)
         ui_obj.actionLogout.triggered.connect(self.logout_action)
@@ -25,18 +26,31 @@ class MainWindowClass(QtWidgets.QMainWindow):
         ui_obj.actionCreate.triggered.connect(self.create_action)
         ui_obj.actionRefresh.triggered.connect(self.refresh_note_list_dialog)
         
-        ui_obj.noteTreeWidget.itemDoubleClicked.connect(self.print_clicked_item)
+        ui_obj.noteTreeWidget.itemDoubleClicked.connect(self.open_note_editor)
         self.update_loginlabel_text()
 
     @Slot(QtWidgets.QTreeWidgetItem, int)
-    def print_clicked_item(self, item, column):
-        print([item.text(i) for i in range(item.columnCount())])
+    def open_note_editor(self, item, column):
+        id_str=item.text(item.columnCount()-1)
+        # One off the end of the list -> End of list when inserted
         note_window = EditorClass(Ui_NoteEditWindow(),
                                    self.config_obj,
-                                   item.text(item.columnCount()-1))
+                                   id_str)
         note_window.show()
-        self.list_subwindow.append(note_window)
-        print(self.list_subwindow)
+        note_window.close_signal.connect(self.note_editor_closed)
+        note_window.destroyed.connect(self.clean_window_dictionary)
+        self.list_subwindow[id_str]=note_window
+    
+    @Slot(QtWidgets.QMainWindow)
+    def note_editor_closed(self,editor_window):
+        self.list_id_clean.append(editor_window.note_id)
+        # deleteLater not needed because of WA_DeleteOnClose
+    
+    @Slot(QtWidgets.QWidget)
+    def clean_window_dictionary(self,unused_input):
+        for id_val in self.list_id_clean:
+            del self.list_subwindow[id_val]
+        self.list_id_clean.clear()
 
     def update_loginlabel_text(self):
         current_username=self.config_obj.username
